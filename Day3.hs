@@ -15,8 +15,10 @@ mulOperands s
     (a, rest') = splitAtFirst ',' rest
     (b, _) = splitAtFirst ')' rest'
 
-findMuls :: String -> [(Int, Int)]
-findMuls s = mapMaybe (\i -> mulOperands $ drop i s) [0 .. length s - 1]
+findMuls :: String -> [Int] -> [Int] -> [(Int, Int)]
+findMuls s dos donts = mapMaybe (\i -> mulOperands (drop i s) >>= (\x -> if enabled i then Just x else Nothing)) [0 .. length s - 1]
+  where
+    enabled i = last (filter (<= i) dos) >= last (filter (<= i) donts)
 
 subStrings :: String -> String -> [Int]
 subStrings f x =
@@ -28,24 +30,19 @@ subStrings f x =
       | f `isPrefixOf` x = i : subStrings' f (drop l x) (i + l)
       | otherwise = subStrings' f (drop 1 x) (i + 1)
 
-findMuls' :: String -> [(Int, Int)]
-findMuls' s = mapMaybe (\i -> mulOperands (drop i s) >>= (\x -> if enabled i then Just x else Nothing)) [0 .. length s - 1]
-  where
-    dos = -1 : subStrings "do()" s
-    donts = -2 : subStrings "don't()" s
-    enabled i = last (filter (<= i) dos) >= last (filter (<= i) donts)
-
 total :: [(Int, Int)] -> Int
 total = sum . map (uncurry (*))
 
 partOne :: IO ()
 partOne = do
   contents <- readFile "in.txt"
-  let muls = findMuls contents
+  let muls = findMuls contents [-1] [-2]
   print (total muls :: Int)
 
 partTwo :: IO ()
 partTwo = do
   contents <- readFile "in.txt"
-  let muls = findMuls' contents
+  let dos = -1 : subStrings "do()" contents
+  let donts = -2 : subStrings "don't()" contents
+  let muls = findMuls contents dos donts
   print (total muls :: Int)

@@ -70,6 +70,8 @@ library
         Day6
         Day7
         Day8
+        Day9
+        Day10
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -80,7 +82,8 @@ library
     -- Other library packages from which modules are imported.
     build-depends:
         base >= 4.3,
-        containers >= 0.6
+        containers >= 0.6,
+        mtl
 
     -- Directories containing source files.
     hs-source-dirs:   src
